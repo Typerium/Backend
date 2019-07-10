@@ -1,0 +1,12 @@
+schema:
+  - schema/*.graphqls
+exec:
+  filename: server/server.gen.go
+model:
+  filename: models/models.gen.go
+  package: models
+
+resolver:
+  filename: resolvers/root_resolver.go
+  type: Resolver
+  package: resolvers
