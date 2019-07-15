@@ -1,12 +1,12 @@
 schema:
   - schema/*.graphqls
 exec:
-  filename: server/server.gen.go
+  filename: internal/server/server.gen.go
 model:
-  filename: models/models.gen.go
-  package: models
+  filename: internal/server/models.gen.go
+  package: server
 
 resolver:
-  filename: resolvers/root_resolver.go
+  filename: internal/server/root_resolver.go
   type: Resolver
-  package: resolvers
+  package: server

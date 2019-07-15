@@ -1,12 +1,13 @@
 package logging
 
 import (
-	"github.com/pkg/errors"
+	stdlog "log"
+
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
 
-func New() (*zap.Logger, error) {
+func New() *zap.Logger {
 	cfg := zap.Config{
 		Level:       zap.NewAtomicLevelAt(zap.DebugLevel),
 		Development: false,
@@ -32,8 +33,8 @@ func New() (*zap.Logger, error) {
 
 	log, err := cfg.Build(zap.AddStacktrace(zap.WarnLevel))
 	if err != nil {
-		return nil, errors.WithStack(err)
+		stdlog.Fatal(err)
 	}
 
-	return log, nil
+	return log
 }

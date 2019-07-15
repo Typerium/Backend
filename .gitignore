@@ -1,3 +1,4 @@
 .idea
 **/*.gen.go
 **/*.pb.go
+**/*.graphqlconfig.yml
