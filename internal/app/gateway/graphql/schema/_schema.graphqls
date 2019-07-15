@@ -1,4 +1,9 @@
 schema {
     query: Query
-    #    mutation: Mutation
+    mutation: Mutation
 }
+
+scalar Time
+scalar Upload
+
+directive @login on OBJECT | FIELD_DEFINITION

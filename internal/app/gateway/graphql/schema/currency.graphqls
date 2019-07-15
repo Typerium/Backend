@@ -1,0 +1,7 @@
+# supported currency type
+enum Currency {
+    # native currence of typerium
+    TYPE
+    # Great Britain Pound
+    GBP
+}

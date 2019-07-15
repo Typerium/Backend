@@ -1,2 +1,9 @@
 type Mutation {
+    signUp(email: String!, userName: String, phone: String, password: String!): User!
+    signIn(login: String!, password: String!): Tokens!
+    signInByAccount(accountType:LoginAccount!=FACEBOOK): Tokens!
+    resetPassword(email: String!): Boolean!
+
+    saveImage(image: Upload!, album: ID): Image! @login
+    publishToMarketPlace(imageId: ID!): MarketPlaceImage! @login
 }

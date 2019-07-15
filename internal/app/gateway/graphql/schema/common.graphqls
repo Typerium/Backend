@@ -1,0 +1,7 @@
+# helper for tracking of changes object
+type TimeMark {
+    # time mark when an object was created
+    createdAt: Time!
+    # time mark when an object was updated
+    updatedAt: Time!
+}

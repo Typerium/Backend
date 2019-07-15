@@ -1,0 +1,23 @@
+# information of registered user
+type User {
+    id: ID!
+    email: String!
+    userName: String
+    phone: String
+    timeMark: TimeMark!
+}
+
+# access control json web tokens
+type Tokens {
+    # authorization header type
+    type: String!
+    # token for execute requests
+    accessToken: String!
+    # token for update accessToken
+    refreshToken: String!
+}
+
+# supported third-party services of authorization
+enum LoginAccount {
+    FACEBOOK
+}

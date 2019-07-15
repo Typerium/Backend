@@ -1,0 +1,21 @@
+type Image {
+    id: ID!
+    name: String!
+    album: Album
+    timeMark: TimeMark!
+}
+
+type Album {
+    id: ID!
+    name: String!
+    description: String
+    timeMark: TimeMark!
+}
+
+type MarketPlaceImage {
+    id: ID!
+    image: Image!
+    price: Float!
+    currency: Currency!
+    timeMark: TimeMark!
+}

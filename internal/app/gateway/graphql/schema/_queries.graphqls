@@ -1,2 +1,8 @@
 type Query {
+    currentUser: User! @login
+
+    albums: [Album!] @login
+    images(limit: Int! = 10, offset: Int! = 0): [Image!] @login
+
+    marketPlaceLots(limit: Int! = 10, offset: Int! = 0): [MarketPlaceImage!] @login
 }
