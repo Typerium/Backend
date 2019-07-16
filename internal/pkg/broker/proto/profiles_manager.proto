@@ -1,0 +1,42 @@
+syntax = "proto2";
+
+package proto;
+
+import "common.proto";
+
+import "gogoproto/gogo.proto";
+import "google/protobuf/empty.proto";
+
+option (gogoproto.testgen_all) = true;
+
+option (gogoproto.equal_all) = true;
+option (gogoproto.verbose_equal_all) = true;
+
+option (gogoproto.gostring_all) = true;
+option (gogoproto.goproto_stringer_all) = false;
+option (gogoproto.stringer_all) = true;
+
+option (gogoproto.populate_all) = true;
+
+option (gogoproto.marshaler_all) = true;
+option (gogoproto.sizer_all) = true;
+option (gogoproto.unmarshaler_all) = true;
+
+message ProfilesUser {
+    optional string id = 1 [(gogoproto.nullable) = true, (gogoproto.customname) = "ID"];
+    required string username = 2 [(gogoproto.nullable) = false];
+    required string email = 3 [(gogoproto.nullable) = false];
+    optional string phone = 4 [(gogoproto.nullable) = true];
+
+    required TimeMark tm = 5 [(gogoproto.nullable) = false];
+}
+
+message ProfilesUserIdentifier {
+    required string id = 1 [(gogoproto.nullable) = false, (gogoproto.customname) = "ID"];
+}
+
+service ProfilesManagerService {
+    rpc CreateUser (ProfilesUser) returns (ProfilesUser);
+    rpc DeleteUser (ProfilesUserIdentifier) returns (google.protobuf.Empty);
+    rpc GetUserByID (ProfilesUserIdentifier) returns (ProfilesUser);
+}
