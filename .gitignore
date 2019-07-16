@@ -2,3 +2,4 @@
 **/*.gen.go
 **/*.pb.go
 **/*.graphqlconfig.yml
+**/*.bindata.go
