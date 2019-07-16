@@ -1,0 +1,26 @@
+syntax = "proto2";
+
+package proto;
+
+import "gogoproto/gogo.proto";
+import "google/protobuf/timestamp.proto";
+
+option (gogoproto.testgen_all) = true;
+
+option (gogoproto.equal_all) = true;
+option (gogoproto.verbose_equal_all) = true;
+
+option (gogoproto.gostring_all) = true;
+option (gogoproto.goproto_stringer_all) = false;
+option (gogoproto.stringer_all) = true;
+
+option (gogoproto.populate_all) = true;
+
+option (gogoproto.marshaler_all) = true;
+option (gogoproto.sizer_all) = true;
+option (gogoproto.unmarshaler_all) = true;
+
+message TimeMark {
+    required google.protobuf.Timestamp created_at = 1 [(gogoproto.stdtime) = true, (gogoproto.nullable) = false];
+    required google.protobuf.Timestamp updated_at = 2 [(gogoproto.stdtime) = true, (gogoproto.nullable) = false];
+}

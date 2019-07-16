@@ -1,6 +1,9 @@
 package store
 
 import (
+	"context"
+
+	uuid "github.com/satori/go.uuid"
 	"go.uber.org/zap"
 
 	"typerium/internal/app/profiles_manager/store/migrations"
@@ -11,6 +14,10 @@ import (
 
 type Store interface {
 	database.Connector
+
+	CreateUser(ctx context.Context, in *User) (out *User, err error)
+	DeleteUser(ctx context.Context, id uuid.UUID) (err error)
+	GetUserByID(ctx context.Context, id uuid.UUID) (out *User, err error)
 }
 
 func New(uri string, version uint, log *zap.Logger) Store {

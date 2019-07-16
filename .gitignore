@@ -1,5 +1,7 @@
 .idea
+**/*_mock_test.go
 **/*.gen.go
 **/*.pb.go
+**/*pb_test.go
 **/*.graphqlconfig.yml
 **/*.bindata.go
