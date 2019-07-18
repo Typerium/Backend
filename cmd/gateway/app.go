@@ -5,9 +5,10 @@ import (
 
 	"typerium/internal/app/gateway/graphql"
 	"typerium/internal/app/gateway/handlers"
-	"typerium/internal/pkg/httpserver"
+	_ "typerium/internal/pkg/config"
 	"typerium/internal/pkg/logging"
 	"typerium/internal/pkg/waiter"
+	"typerium/internal/pkg/web"
 )
 
 const (
@@ -17,7 +18,7 @@ const (
 func main() {
 	log := logging.New()
 
-	server := httpserver.NewServer(log)
+	server := web.NewServer(log)
 
 	gqlExecutor := graphql.New(log)
 	gqlHandler := handlers.Handler(gqlExecutor)

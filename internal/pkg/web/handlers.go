@@ -1,4 +1,4 @@
-package httpserver
+package web
 
 import (
 	"github.com/gramework/gramework"
