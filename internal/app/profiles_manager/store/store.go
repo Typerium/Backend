@@ -4,7 +4,6 @@ import (
 	"context"
 
 	uuid "github.com/satori/go.uuid"
-	"go.uber.org/zap"
 
 	"typerium/internal/app/profiles_manager/store/migrations"
 	"typerium/internal/pkg/database"
@@ -20,7 +19,7 @@ type Store interface {
 	GetUserByID(ctx context.Context, id uuid.UUID) (out *User, err error)
 }
 
-func New(uri string, version uint, log *zap.Logger) Store {
+func New(uri string, version uint) Store {
 	cfg := &database.Config{
 		URI:              uri,
 		AssetDirFunc:     migrations.AssetDir,
@@ -29,7 +28,7 @@ func New(uri string, version uint, log *zap.Logger) Store {
 		MigrationVersion: version,
 	}
 	conn := &connection{
-		database.NewConnection(cfg, log),
+		database.NewConnection(cfg),
 	}
 
 	return conn

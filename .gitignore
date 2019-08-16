@@ -5,3 +5,5 @@
 **/*pb_test.go
 **/*.graphqlconfig.yml
 **/*.bindata.go
+coverage.out
+coverage.html

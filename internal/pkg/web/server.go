@@ -9,12 +9,12 @@ import (
 	"typerium/internal/pkg/logging"
 )
 
-func NewServer(log *zap.Logger) *Server {
+func NewServer() *Server {
 	gramework.DisableFlags()
 
 	server := &Server{
 		App: gramework.New(),
-		log: log.Named("http_server"),
+		log: logging.New("http_server"),
 	}
 
 	server.App.Logger = logging.NewGrameworkLogger(server.log)

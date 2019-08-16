@@ -17,3 +17,7 @@ func BasicAuth(username, password string) []byte {
 
 	return append(basicAuthPrefix, buf ...)
 }
+
+const (
+	BearerSchema = "Bearer"
+)

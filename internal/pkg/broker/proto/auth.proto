@@ -1,0 +1,64 @@
+syntax = "proto2";
+
+package proto;
+
+import "common.proto";
+
+import "gogoproto/gogo.proto";
+import "google/protobuf/empty.proto";
+
+option (gogoproto.testgen_all) = true;
+
+option (gogoproto.equal_all) = true;
+option (gogoproto.verbose_equal_all) = true;
+
+option (gogoproto.gostring_all) = true;
+option (gogoproto.goproto_stringer_all) = false;
+option (gogoproto.stringer_all) = true;
+
+option (gogoproto.populate_all) = true;
+
+option (gogoproto.marshaler_all) = true;
+option (gogoproto.sizer_all) = true;
+option (gogoproto.unmarshaler_all) = true;
+
+service AuthService {
+    rpc CreateUser (NewAuthUser) returns (AuthUser);
+    rpc DeleteUser (UserIdentifier) returns (google.protobuf.Empty);
+
+    rpc SignIn (AuthCredentials) returns (Session);
+    rpc SignOut (AccessCredentials) returns (Session);
+    rpc RefreshSession (AccessCredentials) returns (Session);
+}
+
+message AuthCredentials {
+    required string login = 1 [(gogoproto.nullable) = false];
+    required string password = 2 [(gogoproto.nullable) = false];
+}
+
+message AccessCredentials {
+    required string token = 1 [(gogoproto.nullable) = false];
+}
+
+message Tokens {
+    required string access_token = 1 [(gogoproto.nullable) = false];
+    required string refresh_token = 2 [(gogoproto.nullable) = false];
+}
+
+message NewAuthUser {
+    required string id = 1 [(gogoproto.nullable) = true, (gogoproto.customname) = "ID"];
+    repeated string logins = 2;
+    required string password = 3 [(gogoproto.nullable) = false];
+}
+
+message AuthUser {
+    required string id = 1 [(gogoproto.nullable) = false, (gogoproto.customname) = "ID"];
+    required string login = 2 [(gogoproto.nullable) = false];
+    required TimeMark time_mark = 3 [(gogoproto.nullable) = false];
+}
+
+message Session {
+    required string id = 1 [(gogoproto.nullable) = false, (gogoproto.customname) = "ID"];
+    required Tokens tokens = 2 [(gogoproto.nullable) = false];
+    required TimeMark time_mark = 3 [(gogoproto.nullable) = false];
+}

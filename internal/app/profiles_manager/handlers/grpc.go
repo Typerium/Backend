@@ -1,6 +1,8 @@
 package handlers
 
 import (
+	"strings"
+
 	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/pkg/errors"
 	uuid "github.com/satori/go.uuid"
@@ -19,13 +21,12 @@ type grpcServer struct {
 }
 
 func userToProto(in *store.User) *proto.ProfilesUser {
-	id := in.ID.String()
 	out := &proto.ProfilesUser{
-		ID:       &id,
+		ID:       in.ID.String(),
 		Username: in.Username,
 		Email:    in.Email,
 		Phone:    in.Phone,
-		Tm: proto.TimeMark{
+		TimeMark: proto.TimeMark{
 			CreatedAt: in.CreatedAt,
 			UpdatedAt: in.UpdatedAt,
 		},
@@ -33,10 +34,18 @@ func userToProto(in *store.User) *proto.ProfilesUser {
 	return out
 }
 
-func (s *grpcServer) CreateUser(ctx context.Context, in *proto.ProfilesUser) (out *proto.ProfilesUser, err error) {
+func (s *grpcServer) CreateUser(ctx context.Context, in *proto.NewProfilesUser) (out *proto.ProfilesUser, err error) {
+	var username string
+	emailSplit := strings.Split(in.Email, "@")
+	if len(emailSplit) > 0 {
+		username = emailSplit[0]
+	}
+	if in.Username != nil {
+		username = *in.Username
+	}
 	user := &store.User{
 		ID:       uuid.Nil,
-		Username: in.Username,
+		Username: username,
 		Email:    in.Email,
 		Phone:    in.Phone,
 	}
@@ -56,7 +65,7 @@ func (s *grpcServer) CreateUser(ctx context.Context, in *proto.ProfilesUser) (ou
 	return userToProto(user), nil
 }
 
-func (s *grpcServer) DeleteUser(ctx context.Context, in *proto.ProfilesUserIdentifier) (out *empty.Empty, err error) {
+func (s *grpcServer) DeleteUser(ctx context.Context, in *proto.UserIdentifier) (out *empty.Empty, err error) {
 	userID, err := uuid.FromString(in.ID)
 	if err != nil {
 		err = errors.WithStack(err)
@@ -72,7 +81,7 @@ func (s *grpcServer) DeleteUser(ctx context.Context, in *proto.ProfilesUserIdent
 	return
 }
 
-func (s *grpcServer) GetUserByID(ctx context.Context, in *proto.ProfilesUserIdentifier) (out *proto.ProfilesUser, err error) {
+func (s *grpcServer) GetUserByID(ctx context.Context, in *proto.UserIdentifier) (out *proto.ProfilesUser, err error) {
 	userID, err := uuid.FromString(in.ID)
 	if err != nil {
 		err = errors.WithStack(err)

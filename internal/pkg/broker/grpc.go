@@ -4,9 +4,7 @@ import (
 	"context"
 	"net"
 	"sync"
-	"time"
 
-	validation "github.com/go-ozzo/ozzo-validation"
 	"github.com/pkg/errors"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
@@ -14,15 +12,17 @@ import (
 	"google.golang.org/grpc/health"
 	"google.golang.org/grpc/health/grpc_health_v1"
 	"google.golang.org/grpc/status"
+
+	"typerium/internal/pkg/logging"
 )
 
-func NewGRPCServer(log *zap.Logger, errorsMapper map[error]error) *GRPCServer {
+func NewGRPCServer(errorsMapper map[error]error) *GRPCServer {
 	if errorsMapper == nil {
 		errorsMapper = make(map[error]error)
 	}
 
 	server := &GRPCServer{
-		log:          log.Named("grpc"),
+		log:          logging.New("grpc_server"),
 		errorsMapper: errorsMapper,
 	}
 
@@ -44,31 +44,22 @@ type GRPCServer struct {
 
 // grpc errors
 var (
-	InternalGRPCErr          = status.Error(codes.Unknown, "internal error")
-	NotFoundGRPCErr          = status.Error(codes.NotFound, "not found")
-	BadInputArgumentsGRPCErr = status.Error(codes.InvalidArgument, "bad input arguments")
-	UnavailableGRPCErr       = status.Error(codes.Unavailable, "service isn't available")
+	InternalGRPCError          = status.Error(codes.Unknown, "internal error")
+	NotFoundGRPCError          = status.Error(codes.NotFound, "not found")
+	BadInputArgumentsGRPCError = status.Error(codes.InvalidArgument, "bad input arguments")
 )
 
 func (s *GRPCServer) unaryInterceptor(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo,
 	handler grpc.UnaryHandler) (resp interface{}, err error) {
 	if req == nil {
-		return nil, BadInputArgumentsGRPCErr
-	}
-
-	validator, ok := req.(validation.Validatable)
-	if ok {
-		err = validator.Validate()
-		if err != nil {
-			return nil, s.handlerError(err)
-		}
+		return nil, BadInputArgumentsGRPCError
 	}
 
 	resp, err = handler(ctx, req)
 	if err != nil {
-		return nil, s.handlerError(err)
+		err = s.handlerError(err)
+		return
 	}
-
 	return
 }
 
@@ -95,7 +86,7 @@ func (s *GRPCServer) handlerError(input error) error {
 	}
 
 	s.log.Warn("unprocessed error", zap.Error(input))
-	return InternalGRPCErr
+	return InternalGRPCError
 }
 
 func (s *GRPCServer) ServeOnAddress(addr string) {
@@ -113,7 +104,7 @@ func (s *GRPCServer) ServeOnAddress(addr string) {
 			s.log.Fatal("staring is failed", zap.Error(err))
 		}
 	}()
-	s.log.Info("server is started")
+	s.log.Info("server is started", zap.String("address", addr))
 }
 
 func (s *GRPCServer) GracefulStop() {
@@ -122,45 +113,42 @@ func (s *GRPCServer) GracefulStop() {
 	s.log.Info("server is stopped")
 }
 
-type grpcClient struct {
-	uri            string
-	defaultTimeout time.Duration
-	log            *zap.Logger
+type GRPCClientFactory interface {
+	Acquire(ctx context.Context) (*grpc.ClientConn, error)
+	Release(client *grpc.ClientConn)
 }
 
-func (client *grpcClient) Acquire(ctx context.Context) *grpc.ClientConn {
-	if ctx == nil {
-		ctx = context.Background()
+func NewGRPCClientFactory(log *zap.Logger, uri string, opts ...grpc.DialOption) GRPCClientFactory {
+	log = log.Named("grpc_client").With(zap.String("uri", uri))
+	defer log.Info("client is created")
+	if len(opts) == 0 {
+		opts = append(opts, grpc.WithInsecure())
 	}
-	_, ok := ctx.Deadline()
-	if !ok {
-		var cancel context.CancelFunc
-		ctx, cancel = context.WithTimeout(ctx, client.defaultTimeout)
-		defer cancel()
+	return &grpcClientFactory{
+		log:  log,
+		uri:  uri,
+		opts: opts,
 	}
-
-	conn, err := grpc.DialContext(ctx, client.uri)
-	if err != nil {
-		client.log.Error("can't connect to grpc server",
-			zap.Error(err),
-			zap.String("uri", client.uri),
-		)
-		return nil
-	}
-
-	return conn
 }
 
-func (client *grpcClient) Release(conn *grpc.ClientConn) {
-	if conn == nil {
-		return
+type grpcClientFactory struct {
+	log  *zap.Logger
+	uri  string
+	opts []grpc.DialOption
+}
+
+func (f *grpcClientFactory) Acquire(ctx context.Context) (*grpc.ClientConn, error) {
+	client, err := grpc.DialContext(ctx, f.uri, f.opts...)
+	if err != nil {
+		return nil, errors.WithStack(err)
 	}
 
-	err := conn.Close()
+	return client, nil
+}
+
+func (f *grpcClientFactory) Release(client *grpc.ClientConn) {
+	err := client.Close()
 	if err != nil {
-		client.log.Error("failed closing grpc connection",
-			zap.Error(err),
-			zap.String("uri", client.uri),
-		)
+		f.log.Error("can't close connection", zap.Error(err))
 	}
 }

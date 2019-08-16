@@ -7,7 +7,9 @@ import (
 	"go.uber.org/zap/zapcore"
 )
 
-func New() *zap.Logger {
+var logInstance *zap.Logger
+
+func init() {
 	cfg := zap.Config{
 		Level:       zap.NewAtomicLevelAt(zap.DebugLevel),
 		Development: false,
@@ -35,6 +37,13 @@ func New() *zap.Logger {
 	if err != nil {
 		stdlog.Fatal(err)
 	}
+	logInstance = log
+}
 
-	return log
+func New(name string) *zap.Logger {
+	if len(name) == 0 {
+		return logInstance
+	}
+
+	return logInstance.Named(name)
 }

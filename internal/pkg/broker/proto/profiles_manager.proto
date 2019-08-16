@@ -22,21 +22,25 @@ option (gogoproto.marshaler_all) = true;
 option (gogoproto.sizer_all) = true;
 option (gogoproto.unmarshaler_all) = true;
 
-message ProfilesUser {
+service ProfilesManagerService {
+    rpc CreateUser (NewProfilesUser) returns (ProfilesUser);
+    rpc DeleteUser (UserIdentifier) returns (google.protobuf.Empty);
+    rpc GetUserByID (UserIdentifier) returns (ProfilesUser);
+}
+
+message NewProfilesUser {
     optional string id = 1 [(gogoproto.nullable) = true, (gogoproto.customname) = "ID"];
+    optional string username = 2 [(gogoproto.nullable) = true];
+    required string email = 3 [(gogoproto.nullable) = false];
+    optional string phone = 4 [(gogoproto.nullable) = true];
+}
+
+message ProfilesUser {
+    required string id = 1 [(gogoproto.nullable) = false, (gogoproto.customname) = "ID"];
     required string username = 2 [(gogoproto.nullable) = false];
     required string email = 3 [(gogoproto.nullable) = false];
     optional string phone = 4 [(gogoproto.nullable) = true];
 
-    required TimeMark tm = 5 [(gogoproto.nullable) = false];
+    required TimeMark time_mark = 5 [(gogoproto.nullable) = false];
 }
 
-message ProfilesUserIdentifier {
-    required string id = 1 [(gogoproto.nullable) = false, (gogoproto.customname) = "ID"];
-}
-
-service ProfilesManagerService {
-    rpc CreateUser (ProfilesUser) returns (ProfilesUser);
-    rpc DeleteUser (ProfilesUserIdentifier) returns (google.protobuf.Empty);
-    rpc GetUserByID (ProfilesUserIdentifier) returns (ProfilesUser);
-}

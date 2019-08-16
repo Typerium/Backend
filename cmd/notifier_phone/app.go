@@ -13,13 +13,13 @@ import (
 )
 
 const (
-	twilioUsername = "twilio_username"
-	twilioPassword = "twilio_password"
+	twilioUsername = "TWILIO_USERNAME"
+	twilioPassword = "TWILIO_PASSWORD"
 )
 
 func main() {
-	log := logging.New()
-
+	log := logging.New("")
+	
 	viper.SetDefault(twilioUsername, "user")
 	viper.SetDefault(twilioPassword, "123456")
 
@@ -27,10 +27,10 @@ func main() {
 	twilioProvider, err := provider.NewTwilioProvider(clientFactory, viper.GetString(twilioUsername),
 		viper.GetString(twilioPassword))
 	if err != nil {
-		log.Fatal("", zap.Error(err))
+		log.Fatal("twilio provider can't create", zap.Error(err))
 	}
 
 	handlers.NewQueueBroker(twilioProvider)
 
-	waiter.Wait(log)
+	waiter.Wait()
 }

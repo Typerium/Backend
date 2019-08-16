@@ -15,6 +15,8 @@ import (
 
 	"typerium/internal/app/gateway/graphql/internal/response"
 	"typerium/internal/app/gateway/graphql/internal/server"
+	"typerium/internal/pkg/broker/proto"
+	"typerium/internal/pkg/logging"
 )
 
 //go:generate go run github.com/99designs/gqlgen --config gqlgen.yml
@@ -29,13 +31,16 @@ type Executor interface {
 	Exec(ctx context.Context, request *Request) *graphql.Response
 }
 
-func New(log *zap.Logger) Executor {
-
+func New(authService proto.AuthServiceClient,
+	profilesManagerService proto.ProfilesManagerServiceClient) Executor {
 	return &gqlGenExecutor{
 		ExecutableSchema: server.NewExecutableSchema(server.Config{
-			Resolvers: &server.Resolver{},
+			Resolvers: server.NewResolvers(
+				authService,
+				profilesManagerService,
+			),
 		}),
-		log: log.Named("graphql"),
+		log: logging.New("graphql"),
 	}
 }
 

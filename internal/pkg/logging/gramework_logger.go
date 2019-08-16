@@ -9,6 +9,9 @@ import (
 )
 
 func NewGrameworkLogger(log *zap.Logger) apexlog.Interface {
+	if log == nil {
+		log = logInstance
+	}
 	instance := &grameworkLogger{
 		log: log,
 	}

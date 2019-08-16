@@ -6,16 +6,16 @@ import (
 	"os/signal"
 	"syscall"
 
-	"go.uber.org/zap"
+	"typerium/internal/pkg/logging"
 )
 
 // Wait function for wait signal and continue execute thread
-func Wait(log *zap.Logger) {
+func Wait() {
 	sig := make(chan os.Signal, 1)
 	defer close(sig)
 
 	signal.Notify(sig, syscall.SIGINT, syscall.SIGTERM, syscall.SIGKILL)
 	receivedSignal := <-sig
 
-	log.Info(fmt.Sprintf("received signal '%s'", receivedSignal.String()))
+	logging.New("waiter").Info(fmt.Sprintf("received signal '%s'", receivedSignal.String()))
 }

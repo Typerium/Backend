@@ -6,10 +6,12 @@ import (
 
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database"
-	"github.com/golang-migrate/migrate/v4/source/go_bindata"
+	bindata "github.com/golang-migrate/migrate/v4/source/go_bindata"
 	"github.com/jmoiron/sqlx"
 	"github.com/pkg/errors"
 	"go.uber.org/zap"
+
+	"typerium/internal/pkg/logging"
 )
 
 // AssetDirFunc return names files in migrations directory
@@ -28,6 +30,7 @@ type Config struct {
 	MigrationVersion uint
 }
 
+// Connector interface
 type Connector interface {
 	Ping() error
 	PingContext(ctx context.Context) error
@@ -42,9 +45,9 @@ type Connection struct {
 }
 
 // NewConnection constructor for Connection
-func NewConnection(cfg *Config, log *zap.Logger) (conn *Connection) {
+func NewConnection(cfg *Config) (conn *Connection) {
 	conn = &Connection{
-		Logger: log.Named("database"),
+		Logger: logging.New("database"),
 	}
 
 	if cfg == nil {
@@ -101,6 +104,7 @@ func NewConnection(cfg *Config, log *zap.Logger) (conn *Connection) {
 	return
 }
 
+// Close db connection
 func (c *Connection) Close() {
 	err := c.DB.Close()
 	if err != nil {

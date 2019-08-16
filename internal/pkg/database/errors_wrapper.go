@@ -25,7 +25,7 @@ func (c *Connection) Register(f WrapperFunc) {
 // Wrap processing input error and swap error to another error if wrapping is success by WrapperFunc
 func (c *Connection) Wrap(input error) error {
 	cleanErr := errors.Cause(input)
-	if cleanErr == sql.ErrNoRows || cleanErr == ErrInternal {
+	if cleanErr == nil || cleanErr == sql.ErrNoRows || cleanErr == ErrInternal {
 		return cleanErr
 	}
 

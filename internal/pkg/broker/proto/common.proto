@@ -24,3 +24,7 @@ message TimeMark {
     required google.protobuf.Timestamp created_at = 1 [(gogoproto.stdtime) = true, (gogoproto.nullable) = false];
     required google.protobuf.Timestamp updated_at = 2 [(gogoproto.stdtime) = true, (gogoproto.nullable) = false];
 }
+
+message UserIdentifier {
+    required string id = 1 [(gogoproto.nullable) = false, (gogoproto.customname) = "ID"];
+}

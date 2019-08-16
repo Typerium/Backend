@@ -4,49 +4,50 @@ import (
 	"context"
 
 	"github.com/99designs/gqlgen/graphql"
-) // THIS CODE IS A STARTING POINT ONLY. IT WILL NOT BE UPDATED WITH SCHEMA CHANGES.
 
-type Resolver struct{}
+	"typerium/internal/app/gateway/attributes"
+	"typerium/internal/pkg/broker/proto"
+)
 
-func (r *Resolver) Mutation() MutationResolver {
-	return &mutationResolver{r}
-}
-func (r *Resolver) Query() QueryResolver {
-	return &queryResolver{r}
-}
+type Resolvers struct {
+	TokenAttr  attributes.AttributeString
+	UserIDAttr attributes.AttributeUUID
 
-type mutationResolver struct{ *Resolver }
-
-func (r *mutationResolver) SignUp(ctx context.Context, email string, userName *string, phone *string, password string) (*User, error) {
-	panic("not implemented")
-}
-func (r *mutationResolver) SignIn(ctx context.Context, login string, password string) (*Tokens, error) {
-	panic("not implemented")
-}
-func (r *mutationResolver) SignInByAccount(ctx context.Context, accountType LoginAccount) (*Tokens, error) {
-	panic("not implemented")
-}
-func (r *mutationResolver) ResetPassword(ctx context.Context, email string) (bool, error) {
-	panic("not implemented")
-}
-func (r *mutationResolver) SaveImage(ctx context.Context, image graphql.Upload, album *string) (*Image, error) {
-	panic("not implemented")
-}
-func (r *mutationResolver) PublishToMarketPlace(ctx context.Context, imageID string) (*MarketPlaceImage, error) {
-	panic("not implemented")
+	AuthService            proto.AuthServiceClient
+	ProfilesManagerService proto.ProfilesManagerServiceClient
 }
 
-type queryResolver struct{ *Resolver }
+func NewResolvers(authService proto.AuthServiceClient,
+	profilesManagerService proto.ProfilesManagerServiceClient) *Resolvers {
+	return &Resolvers{
+		TokenAttr:  attributes.NewSchemaTokenAttribute(),
+		UserIDAttr: attributes.NewUserIDAttribute(),
 
-func (r *queryResolver) CurrentUser(ctx context.Context) (*User, error) {
+		AuthService:            authService,
+		ProfilesManagerService: profilesManagerService,
+	}
+}
+
+func (r *Resolvers) Mutation() MutationResolver {
+	return r
+}
+func (r *Resolvers) Query() QueryResolver {
+	return r
+}
+
+func (r *Resolvers) SaveImage(ctx context.Context, image graphql.Upload, album *string) (*Image, error) {
 	panic("not implemented")
 }
-func (r *queryResolver) Albums(ctx context.Context) ([]*Album, error) {
+func (r *Resolvers) PublishToMarketPlace(ctx context.Context, imageID string) (*MarketPlaceImage, error) {
 	panic("not implemented")
 }
-func (r *queryResolver) Images(ctx context.Context, limit int, offset int) ([]*Image, error) {
+
+func (r *Resolvers) Albums(ctx context.Context) ([]*Album, error) {
 	panic("not implemented")
 }
-func (r *queryResolver) MarketPlaceLots(ctx context.Context, limit int, offset int) ([]*MarketPlaceImage, error) {
+func (r *Resolvers) Images(ctx context.Context, limit int, offset int) ([]*Image, error) {
+	panic("not implemented")
+}
+func (r *Resolvers) MarketPlaceLots(ctx context.Context, limit int, offset int) ([]*MarketPlaceImage, error) {
 	panic("not implemented")
 }

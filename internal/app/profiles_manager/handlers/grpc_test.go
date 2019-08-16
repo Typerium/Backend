@@ -38,7 +38,7 @@ func Test_grpcServer_CreateUser(t *testing.T) {
 	t.Run("user id is set", func(t *testing.T) {
 		t.Run("invalid id", func(t *testing.T) {
 			id := "test"
-			in := &proto.ProfilesUser{
+			in := &proto.NewProfilesUser{
 				ID: &id,
 			}
 			out, err := server.CreateUser(context.TODO(), in)
@@ -48,7 +48,7 @@ func Test_grpcServer_CreateUser(t *testing.T) {
 
 		t.Run("valid id", func(t *testing.T) {
 			id := uuid.NewV4().String()
-			in := &proto.ProfilesUser{
+			in := &proto.NewProfilesUser{
 				ID: &id,
 			}
 			grpcServer_CreateUser(t, server, db, in)
@@ -56,12 +56,12 @@ func Test_grpcServer_CreateUser(t *testing.T) {
 	})
 
 	t.Run("user id isn't set", func(t *testing.T) {
-		grpcServer_CreateUser(t, server, db, new(proto.ProfilesUser))
+		grpcServer_CreateUser(t, server, db, new(proto.NewProfilesUser))
 	})
 }
 
 func grpcServer_CreateUser(t *testing.T, server proto.ProfilesManagerServiceServer, db *MockStore,
-	in *proto.ProfilesUser) {
+	in *proto.NewProfilesUser) {
 	t.Run("creating user in store is failed", func(t *testing.T) {
 		ctx := context.TODO()
 		db.EXPECT().CreateUser(ctx, gomock.Any()).Return(nil, errors.New("test"))
@@ -87,7 +87,7 @@ func Test_grpcServer_DeleteUser(t *testing.T) {
 	server := NewGRPCServer(db)
 
 	t.Run("invalid user id", func(t *testing.T) {
-		out, err := server.DeleteUser(context.TODO(), &proto.ProfilesUserIdentifier{
+		out, err := server.DeleteUser(context.TODO(), &proto.UserIdentifier{
 			ID: "test",
 		})
 		assert.Nil(t, out)
@@ -95,7 +95,7 @@ func Test_grpcServer_DeleteUser(t *testing.T) {
 	})
 
 	id := uuid.NewV4()
-	in := &proto.ProfilesUserIdentifier{
+	in := &proto.UserIdentifier{
 		ID: id.String(),
 	}
 
@@ -124,7 +124,7 @@ func Test_grpcServer_GetUserByID(t *testing.T) {
 	server := NewGRPCServer(db)
 
 	t.Run("invalid user id", func(t *testing.T) {
-		out, err := server.GetUserByID(context.TODO(), &proto.ProfilesUserIdentifier{
+		out, err := server.GetUserByID(context.TODO(), &proto.UserIdentifier{
 			ID: "test",
 		})
 		assert.Nil(t, out)
@@ -132,7 +132,7 @@ func Test_grpcServer_GetUserByID(t *testing.T) {
 	})
 
 	id := uuid.NewV4()
-	in := &proto.ProfilesUserIdentifier{
+	in := &proto.UserIdentifier{
 		ID: id.String(),
 	}
 
